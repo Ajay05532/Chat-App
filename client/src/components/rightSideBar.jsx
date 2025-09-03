@@ -37,7 +37,7 @@ const RightSideBar = () => {
           <img className='w-20 h-auto' src={assets.pic2} alt="media" />
           <img className='w-20 h-auto' src={assets.pic3} alt="media" />
           <img className='w-20 h-auto' src={assets.pic4} alt="media" />
-          
+          {/* will add something tommorow */}
         </div>
       </div>
 
