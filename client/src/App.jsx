@@ -7,6 +7,7 @@ import UpdateProfile from './pages/UpdateProfile';
 import NotFound from './pages/NotFound';
 
 const App = () => {
+
   return (
     <>
         <Routes>

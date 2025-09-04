@@ -28,15 +28,12 @@ const initialMessages = [
   },
 ]
 
-const ChatBar = () => {
+const ChatBar = ({ onMediaAdd }) => { // Accept onMediaAdd prop
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState(initialMessages);
   const messagesEndRef = useRef(null);
-
-  // MOVED INSIDE: Hooks must be called inside the component
   const [imagePreview, setImagePreview] = useState(null);
 
-  // MOVED INSIDE: This function needs to be inside to use setImagePreview
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setImagePreview(URL.createObjectURL(e.target.files[0]));
@@ -76,6 +73,12 @@ const ChatBar = () => {
     };
 
     setMessages([...messages, newMessage]);
+    
+    // If it's an image message, add it to the media section
+    if (isImageMessage && onMediaAdd) {
+      onMediaAdd(imagePreview);
+    }
+
     setMessage("");
     setImagePreview(null);
   };
@@ -85,7 +88,6 @@ const ChatBar = () => {
       handleSendMessage();
     }
   };
-
 
   return (
     <div className='bg-orange-50 flex flex-col overflow-scroll'>
@@ -165,7 +167,6 @@ const ChatBar = () => {
             >
               &times;
             </button>
-
           </div>
         )}
         <div className='flex items-center bg-gray-100 rounded-full px-4 py-2'>
@@ -187,7 +188,6 @@ const ChatBar = () => {
               className='h-5 w-5 cursor-pointer'
               src={assets.send_button}
               alt="send"
-            
             />
           </div>
         </div>

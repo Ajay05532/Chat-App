@@ -1,7 +1,15 @@
 import React from 'react'
 import assets from '../assets/assets'
 
-const RightSideBar = () => {
+const RightSideBar = ({mediaItems = [] }) => {
+
+  const allMedia = [
+    assets.pic1,
+    assets.pic2,
+    assets.pic3,
+    assets.pic4,
+    ...mediaItems
+  ]
   return (
     // Add overflow-hidden here
     <div className='bg-slate-900 h-full flex flex-col overflow-hidden'>
@@ -31,14 +39,26 @@ const RightSideBar = () => {
           }
         `}</style>
 
-        <p className='p-3 text-white font-medium'>Media</p>
+        <p className='p-3 text-white font-medium'> Media {mediaItems.length > 0 && `(${allMedia.length})`}</p>
         <div className='flex flex-wrap gap-3 px-3'>
-          <img className='w-20 h-auto' src={assets.pic1} alt="media" />
-          <img className='w-20 h-auto' src={assets.pic2} alt="media" />
-          <img className='w-20 h-auto' src={assets.pic3} alt="media" />
-          <img className='w-20 h-auto' src={assets.pic4} alt="media" />
-          {/* will add something tommorow */}
+
+          {allMedia.map((media, index) =>(
+            <img 
+              key={index} 
+              className='w-20 h-20 rounded cursor-pointer hover:opacity-80 transition-opacity' 
+              src={media} 
+              alt={`media-${index}`}
+              onClick={() => {
+                // Optional: Add click handler to view full size
+              window.open(media, '_blank');
+              }} 
+            />
+
+          ))}
         </div>
+        {allMedia.length === 0 && (
+          <p className='text-gray-400 text-sm px-3'>No media shared yet</p>
+        )}
       </div>
 
     </div>
