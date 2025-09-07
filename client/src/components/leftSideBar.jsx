@@ -1,13 +1,36 @@
-import React from 'react'
+import React, { useState } from 'react'
 import assets from '../assets/assets'
 
 const LeftSideBar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  
   return (
-    <div className='bg-slate-900 w-[1/4] h-[100%] flex flex-col'>
+    <div className='bg-slate-900  h-full flex flex-col'>
       {/* Header Section */}
       <div className='flex gap-7 justify-between items-center mt-5 px-5'>
         <img className='h-10 w-32' src={assets.logo} alt="logo" />
-        <img className='h-6 w-6 cursor-pointer hover:opacity-80' src={assets.menu_icon} alt="menu" />
+
+        {/* --- Dropdown Menu Container --- */}
+        <div className="relative">
+          {/* 2. Changed event handler to onClick to toggle the menu */}
+          <img 
+            className='h-6 w-6 cursor-pointer hover:opacity-80' 
+            src={assets.menu_icon} 
+            alt="menu" 
+            onClick={() => setIsMenuOpen(!isMenuOpen)} // <-- KEY CHANGE HERE
+          />
+
+          {/* 3. Conditional rendering (this stays the same) */}
+          {isMenuOpen && (
+            <div className='absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10'>
+              <div className='py-1'>
+                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'>Edit profile</p>
+                <hr className='border-gray-200' />
+                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'>Logout</p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Search Bar */}
@@ -25,7 +48,7 @@ const LeftSideBar = () => {
         <div className='flex items-center gap-3 p-3 hover:bg-slate-800 cursor-pointer rounded-lg mx-3 mb-2'>
           <img 
             className='h-12 w-12 rounded-full object-cover' 
-            src={assets.pic2} 
+            src={assets.pic1} 
             alt="profile" 
           />
           <div className='flex-1 text-white'>
@@ -68,8 +91,6 @@ const LeftSideBar = () => {
             <p className='text-xs text-gray-400 truncate'>See you tomorrow!</p>
           </div>
         </div>
-
-        {/* More chat items can be added here */}
       </div>
     </div>
   )

@@ -45,7 +45,7 @@ const RightSideBar = ({mediaItems = [] }) => {
           {allMedia.map((media, index) =>(
             <img 
               key={index} 
-              className='w-20 h-20 rounded cursor-pointer hover:opacity-80 transition-opacity' 
+              className='w-auto h-12 rounded cursor-pointer hover:opacity-80 transition-opacity' 
               src={media} 
               alt={`media-${index}`}
               onClick={() => {
