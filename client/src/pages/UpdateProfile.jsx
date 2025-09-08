@@ -15,8 +15,6 @@ const UpdateProfile = () => {
 
   return (
     <div className="bg-[url('/background.png')] min-h-screen bg-no-repeat bg-center bg-cover flex items-center justify-center">
-      {/* --- KEY CHANGE 1 --- */}
-      {/* Changed "items-end" back to "items-center" to fix vertical alignment. */}
       <div className="flex items-center bg-white p-8 rounded-lg shadow-xl min-w-[700px]">
         
         <form action="" className="flex flex-col gap-4 items-center min-w-[50%]">
@@ -57,8 +55,6 @@ const UpdateProfile = () => {
           </button>
         </form>
 
-        {/* --- KEY CHANGE 2 --- */}
-        {/* Ensured the logo does NOT show the preview and has proper spacing/sizing. */}
         <div className="flex items-center justify-center ml-[15%]">
             <img 
               src={image?URL.createObjectURL(image):assets.logo_icon}

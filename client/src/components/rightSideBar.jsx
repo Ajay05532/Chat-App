@@ -1,9 +1,14 @@
 import React from 'react'
 import assets from '../assets/assets'
+import firebase from '../config/firebase'
 
 const RightSideBar = ({mediaItems = [] }) => {
 
   const allMedia = [
+    assets.pic1,
+    assets.pic2,
+    assets.pic3,
+    assets.pic4,
     assets.pic1,
     assets.pic2,
     assets.pic3,
@@ -45,7 +50,7 @@ const RightSideBar = ({mediaItems = [] }) => {
           {allMedia.map((media, index) =>(
             <img 
               key={index} 
-              className='w-auto h-12 rounded cursor-pointer hover:opacity-80 transition-opacity' 
+              className='w-20 h-15 rounded cursor-pointer hover:opacity-80 transition-opacity' 
               src={media} 
               alt={`media-${index}`}
               onClick={() => {
@@ -60,7 +65,14 @@ const RightSideBar = ({mediaItems = [] }) => {
           <p className='text-gray-400 text-sm px-3'>No media shared yet</p>
         )}
       </div>
-
+        <div>
+        <button
+            className="w-full bg-blue-600 text-white p-3 rounded-md font-semibold hover:bg-blue-700 transition duration-300 mt-4 disabled:opacity-60 disabled:cursor-not-allowed"
+            onClick={firebase.logout}
+            > 
+              Log Out
+            </button>
+        </div>
     </div>
   )
 }
