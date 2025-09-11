@@ -1,8 +1,11 @@
 import React, { useState } from 'react'
 import assets from '../assets/assets'
+import firebase from 'firebase/compat/app';
 
 const LeftSideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+
   
   return (
     <div className='bg-slate-900  h-full flex flex-col'>
@@ -26,7 +29,9 @@ const LeftSideBar = () => {
               <div className='py-1'>
                 <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'>Edit profile</p>
                 <hr className='border-gray-200' />
-                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'>Logout</p>
+                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'
+                onClick={firebase.logout}
+                >Logout</p>
               </div>
             </div>
           )}

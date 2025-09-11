@@ -36,18 +36,19 @@ const Login = () => {
         });
 
         await setDoc(doc(db, "users", user.uid), {
-          uid: user.uid,
-          username: username,
+          id: user.uid,
+          username: username.toLowerCase(),
           email: email,
           displayName: username,
           photoURL: null,
           createdAt: new Date().toISOString(),
           lastSeen: new Date().toISOString(),
-          isOnline: true
+          isOnline: true,
+          bio:"Hey there i'm using chatApp"
         });
 
-        await setDoc(doc(db, "userchats", user.uid), {
-          chats: []
+        await setDoc(doc(db, "chats", user.uid), {
+          chatData: []
         });
 
         toast.success("Account created successfully!");

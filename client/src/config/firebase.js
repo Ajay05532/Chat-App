@@ -1,7 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth, signOut } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {  getAuth, signOut } from "firebase/auth";
+import {  getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 import { toast } from 'react-toastify';
 // TODO: Add SDKs for Firebase products that you want to use
@@ -30,6 +30,7 @@ export const db = getFirestore(app);
 
 // Initialize Cloud Storage and get a reference to the service
 export const storage = getStorage(app);
+
 
 const logout = async () =>{
   try{
