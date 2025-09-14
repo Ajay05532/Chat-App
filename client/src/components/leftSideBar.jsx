@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import assets from '../assets/assets'
 import firebase from 'firebase/compat/app';
+import { useNavigate } from 'react-router-dom';
 
 const LeftSideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
 
   
@@ -27,7 +29,9 @@ const LeftSideBar = () => {
           {isMenuOpen && (
             <div className='absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10'>
               <div className='py-1'>
-                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'>Edit profile</p>
+                <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'
+                onClick={navigate('/profile')}
+                >Edit profile</p>
                 <hr className='border-gray-200' />
                 <p className='px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer'
                 onClick={firebase.logout}

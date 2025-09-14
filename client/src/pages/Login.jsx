@@ -8,7 +8,7 @@ import assets from '../assets/assets';
 
 const Login = () => {
   // State to manage form inputs
-  const [currState, setCurrState] = useState("Sign up");
+  const [currState, setCurrState] = useState("Login");
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -161,7 +161,7 @@ const Login = () => {
           </button>
 
           {/* Terms and Conditions */}
-          <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
+          {currState == "Sign up" ? <div className="flex items-center gap-3 mt-2 text-sm text-gray-600">
             <input
               type="checkbox"
               id="terms"
@@ -173,7 +173,10 @@ const Login = () => {
             <label htmlFor="terms">
               Agree to the terms of use & privacy policy.
             </label>
-          </div>
+          </div> :
+          null
+          }
+          
 
           {/* Link to Login */}
           <p className="text-center text-sm text-gray-600 mt-4">
@@ -198,4 +201,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Login
