@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import assets from "../assets/assets";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "../config/firebase";
@@ -6,6 +6,7 @@ import { doc, getDoc, updateDoc } from "firebase/firestore";
 import {useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import upload from "../lib/uploadFiles";
+import AppContext from "../context/appContext";
 
 
 const UpdateProfile = () => {
@@ -16,11 +17,12 @@ const UpdateProfile = () => {
   const [bio, setBio] = useState("")
   const [uid, setUid] = useState('');
   const [preImg, setPreImg] = useState('');
+  const {setUserData} = useContext(AppContext)
 
   const profileUpdate = async (event) =>{
     event.preventDefault();
     try{
-      if(!preImg && image) toast.error("upload your profile picture")
+      if(!preImg && !image) toast.error("upload your profile picture")
       const docRef = doc(db, "users", uid)
       if (image) {
         const imgUrl = await upload(image);
@@ -28,16 +30,20 @@ const UpdateProfile = () => {
         await updateDoc(docRef, {
           avatar:imgUrl,
           bio:bio,
-          username:name
+          name:name
         })
       }else{
         await updateDoc(docRef, {
           bio:bio,
-          username:name
+          name:name
         })
       }
+      const snap = await getDoc(docRef);
+      setUserData(snap.data());
+      navigate('/chat')
     }catch(error){
       console.error("Error updating profile:", error);
+      toast.error(error.message);
     }
   }
 
@@ -47,8 +53,8 @@ const UpdateProfile = () => {
         setUid(user.uid);
         const docRef = doc(db, "users", user.uid);
         const docSnap = await getDoc(docRef);
-        if(docSnap.data().username){
-          setName(docSnap.data().username);
+        if(docSnap.data().name){
+          setName(docSnap.data().name);
         }
         if(docSnap.data().bio){
           setBio(docSnap.data().bio);
@@ -60,7 +66,7 @@ const UpdateProfile = () => {
         navigate('/')
       }
     })
-  })
+  }, [navigate])
 
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
@@ -75,7 +81,7 @@ const UpdateProfile = () => {
       <div className="flex items-center bg-white p-8 rounded-lg shadow-xl min-w-[700px]">
         
         <form action="" className="flex flex-col gap-4 items-center min-w-[50%]"
-        onSubmit={profileUpdate()}>
+        onSubmit={profileUpdate}>
           <h3 className="text-2xl font-bold mb-4 text-gray-800">Profile Details</h3>
           <label
             htmlFor="avatar"
@@ -107,7 +113,7 @@ const UpdateProfile = () => {
             placeholder="Add your bio here"
             className="border p-2 rounded-md w-full h-24"
             value={bio}
-            onChange={(e) => setBio(e.target.bio)}
+            onChange={(e) => setBio(e.target.value)}
           ></textarea>
           <button 
             type="submit" 
@@ -117,11 +123,11 @@ const UpdateProfile = () => {
           </button>
         </form>
 
-        <div className="flex items-center justify-center ml-[15%]">
+        <div className="flex items-center justify-center ml-20">
             <img 
-              src={image?URL.createObjectURL(image):assets.logo_icon}
+              src={image?URL.createObjectURL(image):preImg?preImg:assets.logo_icon}
               alt="logo" 
-              className="h-60 w-auto rounded-lg" 
+              className="w-54 h-54  rounded-full object-cover" 
             />
         </div>
 

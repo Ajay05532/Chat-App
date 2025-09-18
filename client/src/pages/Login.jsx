@@ -39,8 +39,7 @@ const Login = () => {
           id: user.uid,
           username: username.toLowerCase(),
           email: email,
-          displayName: username,
-          photoURL: null,
+          name: username,
           createdAt: new Date().toISOString(),
           lastSeen: new Date().toISOString(),
           isOnline: true,
@@ -121,7 +120,7 @@ const Login = () => {
           {currState === "Sign up" ? <input
             type="text"
             placeholder="Username"
-            className="p-2 border-2 border-gray-300 rounded-g focus:outline-none focus:border-blue-500 transition"
+            className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             required
@@ -132,7 +131,7 @@ const Login = () => {
           <input
             type="email"
             placeholder="Email address"
-            className="p-2 border-2 border-gray-300 rounded-l focus:outline-none focus:border-blue-500 transition"
+            className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -143,7 +142,7 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="p-2 border-2 border-gray-300 rounded-l focus:outline-none focus:border-blue-500 transition"
+            className="p-2 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 transition"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

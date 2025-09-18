@@ -43,4 +43,5 @@ const logout = async () =>{
 }
 
 
-export default {app, logout, auth,db};
+export {logout};
+export default app;
