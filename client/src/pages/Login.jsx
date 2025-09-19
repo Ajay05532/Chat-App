@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import assets from '../assets/assets';
 
@@ -14,7 +13,6 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [agreedToTerms, setAgreedToTerms] = useState(false);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   // Handle form submission
   const handleSubmit = async (e) => {
@@ -51,8 +49,8 @@ const Login = () => {
         });
 
         toast.success("Account created successfully!");
-        navigate('/chat');
-      }else {
+        // Navigation will be handled by App.jsx auth listener
+      } else {
         // Login logic
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
 
@@ -64,7 +62,7 @@ const Login = () => {
         }, { merge: true });
 
         toast.success("Logged in successfully!");
-        navigate('/chat');
+        // Navigation will be handled by App.jsx auth listener
       }
 
     } catch (error) {
