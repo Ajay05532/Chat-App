@@ -12,6 +12,7 @@ import {
   doc,
   setDoc,
   serverTimestamp,
+  getDoc,
 } from "firebase/firestore";
 import { toast } from "react-toastify";
 import AppContext from "../context/appContext";
@@ -20,20 +21,16 @@ const LeftSideBar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
-  // Get user data and the function to set the active chat from context
   const {
     userData,
     chatData,
-    chatUser,
     setChatUser,
     setMessagesId,
-    messagesId,
   } = useContext(AppContext);
 
   const [foundUser, setFoundUser] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
 
-  // --- Menu Handlers ---
   const handleEditProfile = () => {
     navigate("/profile");
     setIsMenuOpen(false);
@@ -44,58 +41,97 @@ const LeftSideBar = () => {
     setIsMenuOpen(false);
   };
 
-  // --- Search Logic ---
   const handleSearch = async (e) => {
     const username = e.target.value.toLowerCase().trim();
     if (username) {
       setIsSearching(true);
-      setFoundUser(null); // Reset previous search result
+      setFoundUser(null);
       try {
         const usersRef = collection(db, "users");
         const q = query(usersRef, where("username", "==", username));
         const querySnap = await getDocs(q);
 
         if (!querySnap.empty && querySnap.docs[0].data().id !== userData.id) {
-          // Ensure the found user is not the current user
-          let userExist = false;
-          chatData?.forEach((user) => {
-            if (user.rId === querySnap.docs[0].data().id) {
-              userExist = true;
-            }
-          });
-          if (!userExist) {
-            setFoundUser(querySnap.docs[0].data());
+          const foundUserData = querySnap.docs[0].data();
+          
+          // Check if user already exists in chat list
+          const userAlreadyInChat = chatData?.some(
+            (chat) => chat.rId === foundUserData.id
+          );
+          
+          if (!userAlreadyInChat) {
+            setFoundUser(foundUserData);
+          } else {
+            setFoundUser(null);
+            toast.info("User already in your chat list");
           }
+        } else if (querySnap.docs[0]?.data().id === userData.id) {
+          // Prevent adding yourself
+          setFoundUser(null);
+          toast.error("You cannot add yourself to chat");
+        } else {
+          setFoundUser(null);
         }
-        // Keep isSearching true even if no user found to show "No users found" message
       } catch (error) {
         toast.error("Error searching for user.");
         console.error("Search error:", error);
+        setFoundUser(null);
       }
-      // Don't set isSearching to false here - keep it true while searching
     } else {
       setIsSearching(false);
       setFoundUser(null);
     }
   };
 
-  // --- Chat Creation Logic ---
   const handleAddChat = async () => {
     if (!foundUser || !userData) return;
 
     try {
-      // Create a reference for a new document in the 'messages' collection to get its ID
+      // Double-check that the user doesn't already exist in chat
+      const userAlreadyInChat = chatData?.some(
+        (chat) => chat.rId === foundUser.id
+      );
+      
+      if (userAlreadyInChat) {
+        toast.error("User already in your chat list");
+        setFoundUser(null);
+        setIsSearching(false);
+        return;
+      }
+
+      // Check if chat document exists for both users to prevent duplicates
+      const currentUserChatsRef = doc(db, "chats", userData.id);
+      const otherUserChatsRef = doc(db, "chats", foundUser.id);
+      
+      const [currentUserChatsSnap, otherUserChatsSnap] = await Promise.all([
+        getDoc(currentUserChatsRef),
+        getDoc(otherUserChatsRef)
+      ]);
+
+      // Check for existing chat in both directions
+      const currentUserChats = currentUserChatsSnap.exists() ? currentUserChatsSnap.data().chatData || [] : [];
+      const otherUserChats = otherUserChatsSnap.exists() ? otherUserChatsSnap.data().chatData || [] : [];
+      
+      const existingChatInCurrent = currentUserChats.find(chat => chat.rId === foundUser.id);
+      const existingChatInOther = otherUserChats.find(chat => chat.rId === userData.id);
+      
+      if (existingChatInCurrent || existingChatInOther) {
+        toast.error("Chat already exists between these users");
+        setFoundUser(null);
+        setIsSearching(false);
+        return;
+      }
+
+      // Create new message document
       const messagesCollectionRef = collection(db, "messages");
       const newMessageDocRef = doc(messagesCollectionRef);
 
-      // Create an empty document in 'messages' to hold the conversation
       await setDoc(newMessageDocRef, {
         messageList: [],
         createdAt: serverTimestamp(),
       });
 
-      // Add chat to the current user's chat list
-      const currentUserChatsRef = doc(db, "chats", userData.id);
+      // Add chat to current user's chat list
       await updateDoc(currentUserChatsRef, {
         chatData: arrayUnion({
           messageId: newMessageDocRef.id,
@@ -106,15 +142,14 @@ const LeftSideBar = () => {
         }),
       });
 
-      // Add chat to the other user's chat list
-      const otherUserChatsRef = doc(db, "chats", foundUser.id);
+      // Add chat to other user's chat list
       await updateDoc(otherUserChatsRef, {
         chatData: arrayUnion({
           messageId: newMessageDocRef.id,
           rId: userData.id,
           lastMessage: "",
           updatedAt: Date.now(),
-          messageSeen: false, // New chat is unread for the recipient
+          messageSeen: false,
         }),
       });
 
@@ -123,7 +158,6 @@ const LeftSideBar = () => {
       toast.error("Failed to add chat: " + error.message);
       console.error("Error adding chat:", error);
     } finally {
-      // Reset search state
       setIsSearching(false);
       setFoundUser(null);
       const searchInput = document.querySelector(".search-input");
@@ -131,12 +165,9 @@ const LeftSideBar = () => {
     }
   };
 
-  // --- Chat Selection Logic ---
   const handleSelectChat = (chat) => {
-    // Set the message ID to fetch messages
     setMessagesId(chat.messageId);
 
-    // Create a proper selectedChat object with all necessary data
     const selectedChatData = {
       messageId: chat.messageId,
       rId: chat.rId,
@@ -152,7 +183,6 @@ const LeftSideBar = () => {
 
   return (
     <div className="bg-slate-900 h-full flex flex-col">
-      {/* Header Section */}
       <div className="flex justify-between items-center mt-5 px-5">
         <img className="h-10 w-auto" src={assets.logo} alt="logo" />
         <div className="relative">
@@ -165,17 +195,11 @@ const LeftSideBar = () => {
           {isMenuOpen && (
             <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-10">
               <div className="py-1">
-                <p
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={handleEditProfile}
-                >
+                <p className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={handleEditProfile}>
                   Edit profile
                 </p>
                 <hr className="border-gray-200" />
-                <p
-                  className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                  onClick={handleLogout}
-                >
+                <p className="px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer" onClick={handleLogout}>
                   Logout
                 </p>
               </div>
@@ -184,7 +208,6 @@ const LeftSideBar = () => {
         </div>
       </div>
 
-      {/* Search Bar */}
       <div className="px-5 mt-5">
         <input
           type="text"
@@ -194,20 +217,11 @@ const LeftSideBar = () => {
         />
       </div>
 
-      {/* Content Area: Search Results or Chat List */}
       <div className="flex-1 overflow-y-auto mt-4 px-2">
         {isSearching ? (
           foundUser ? (
-            // Display found user
-            <div
-              className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg mb-2 cursor-pointer hover:bg-slate-700"
-              onClick={handleAddChat}
-            >
-              <img
-                src={foundUser.avatar || assets.avatar_icon}
-                alt="avatar"
-                className="w-10 h-10 rounded-full object-cover"
-              />
+            <div className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg mb-2 cursor-pointer hover:bg-slate-700" onClick={handleAddChat}>
+              <img src={foundUser.avatar || assets.avatar_icon} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
               <div>
                 <p className="text-white font-medium">{foundUser.name}</p>
                 <p className="text-gray-400 text-sm">@{foundUser.username}</p>
@@ -215,39 +229,26 @@ const LeftSideBar = () => {
               </div>
             </div>
           ) : (
-            // Display searching or no results message
             <div className="text-gray-400 text-center p-4">
-              <p>Searching for users...</p>
-              <p className="text-sm mt-2">No users found with that username</p>
+              <p>No user found with that username.</p>
             </div>
           )
-        ) : // Display existing chat list only when not searching
-        chatData && Array.isArray(chatData) && chatData.length > 0 ? (
+        ) : chatData && Array.isArray(chatData) && chatData.length > 0 ? (
           <div>
-            {chatData.map((item, index) => {
-              // Add safety checks for item properties
-              if (!item || typeof item !== "object") {
+            {chatData.map((item) => {
+              if (!item || !item.messageId) {
                 return null;
               }
-
               return (
                 <div
-                  key={item.messageId || index}
+                  key={item.messageId}
                   className="flex items-center gap-3 p-3 bg-slate-800 rounded-lg mb-2 cursor-pointer hover:bg-slate-700"
                   onClick={() => handleSelectChat(item)}
                 >
-                  <img
-                    src={item.avatar || assets.avatar_icon}
-                    alt="avatar"
-                    className="w-10 h-10 rounded-full object-cover"
-                  />
+                  <img src={item.avatar || assets.avatar_icon} alt="avatar" className="w-10 h-10 rounded-full object-cover" />
                   <div className="flex-1">
-                    <p className="text-white font-medium">
-                      {item.name || "Unknown User"}
-                    </p>
-                    <p className="text-gray-400 text-sm truncate">
-                      {item.lastMessage || "No messages yet"}
-                    </p>
+                    <p className="text-white font-medium">{item.name || "Unknown User"}</p>
+                    <p className="text-gray-400 text-sm truncate">{item.lastMessage || "No messages yet"}</p>
                   </div>
                   {!item.messageSeen && (
                     <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
@@ -257,7 +258,6 @@ const LeftSideBar = () => {
             })}
           </div>
         ) : (
-          // Display empty chat list message
           <div className="text-gray-400 text-center p-4">
             Your chat list will appear here.
           </div>

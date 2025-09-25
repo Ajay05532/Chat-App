@@ -5,14 +5,8 @@ import React, { useContext, useEffect, useState } from "react";
 import AppContext from "../context/appContext";
 
 const Chat = () => {
-  const [mediaItems, setMediaItems] = useState([]);
   const { chatData, userData } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
-
-  // Function to add new media to the collection
-  const handleMediaAdd = (imageUrl) => {
-    setMediaItems((prev) => [...prev, imageUrl]);
-  };
 
   useEffect(() => {
     if(chatData && userData){
@@ -21,16 +15,22 @@ const Chat = () => {
   },[chatData, userData])
 
   return (
-
     <div className="w-screen h-screen flex items-center justify-center bg-gradient-to-t from-sky-500 to-indigo-500">
       {loading ? (
-
-        <p className="text-white text-xl">Loading...</p>
+        <p className="text-white"> Loading ...</p>
       ) : (
-        <div className="w-[80%] h-[85%] grid grid-cols-[1fr_2fr_1fr] rounded-xl overflow-hidden shadow-2xl">
-          <LeftSideBar />
-          <ChatBar onMediaAdd={handleMediaAdd} />
-          <RightSideBar mediaItems={mediaItems} />
+        // KEY CHANGE: Switched from 'grid' to 'flex'
+        // We now explicitly define the width of each section
+        <div className="w-[80%] h-[85%] flex flex-row overflow-hidden rounded-lg shadow-lg">
+          <div className="w-1/4 flex-shrink-0">
+            <LeftSideBar />
+          </div>
+          <div className="w-1/2 flex-shrink-0">
+            <ChatBar />
+          </div>
+          <div className="w-1/4 flex-shrink-0">
+            <RightSideBar />
+          </div>
         </div>
       )}
     </div>
