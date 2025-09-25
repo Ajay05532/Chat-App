@@ -1,3 +1,7 @@
+<div align="center">
+  <img width="700" height="auto" alt="Screenshot 2025-09-25 at 2 31 59 PM" src="https://github.com/user-attachments/assets/f6844692-37b2-4f4f-b15b-12975a781846" />
+</div>
+
 # 💬 Real-Time Chat Application
 
 A modern, full-featured real-time chat application built with **React**, **Firebase**, and **TailwindCSS**. Users can authenticate, manage profiles, send messages with images, and chat in real-time with a beautiful, responsive interface.
