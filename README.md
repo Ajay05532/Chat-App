@@ -151,7 +151,7 @@ Contributions are welcome! If you'd like to improve the app, please fork the rep
 
 If you encounter any issues or have questions:
 
-1. Check the [Issues](https://github.com/Ajay05532/Chat-App.git/issues) page
+1. Check the [Issues](https://github.com/Ajay05532/Chat-App/issues) page
 2. Create a new issue with detailed information
 3. Provide error messages and steps to reproduce
 4. Include your environment details (OS, Node.js version, etc.)
