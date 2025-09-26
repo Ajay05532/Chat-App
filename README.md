@@ -105,7 +105,7 @@ npm install
 
 ### 4. Configure Environment Variables
 
-Create a `.env.local` file in your project root `client\`:
+Create a `.env.local` file in your project root `client/`:
 
 ```env
 VITE_API_KEY=your_api_key_here
